@@ -45,9 +45,9 @@ class _LoginPageState extends State<LoginPage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Email Field
                         TextFormField(
                           controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             labelText: 'Email',
                             labelStyle: const TextStyle(color: Colors.black),
@@ -92,12 +92,15 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
+
                         const SizedBox(height: 24),
 
-                        // Login Button
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
+                              //check data with db first
+
+                              //if data is correct
                               Navigator.pushReplacementNamed(context, '/home');
                             }
                           },
@@ -124,7 +127,8 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       TextButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          // because we'll be doing request over the network
                           Navigator.pushNamed(context, '/signup');
                         },
                         child: const Text(

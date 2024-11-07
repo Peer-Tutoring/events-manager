@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AuthCheck(),
+      home: const AuthCheck(),
       routes: {
         '/signup': (context) => const SignupPage(),
         '/home': (context) => const HomePage(),
