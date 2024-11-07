@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:events_manager/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -8,6 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  String? _errorFeedback;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -44,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                   Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         TextFormField(
                           controller: _emailController,
@@ -92,16 +97,33 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 24),
-
+                        if (_errorFeedback != null)
+                          Text(
+                            _errorFeedback!,
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.left,
+                          ),
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              //check data with db first
+                              setState(() {
+                                _errorFeedback = null;
+                              });
+                              final email = _emailController.text.trim();
+                              final password = _passwordController.text.trim();
 
-                              //if data is correct
-                              Navigator.pushReplacementNamed(context, '/home');
+                              final user =
+                                  await AuthService.signIn(email, password);
+
+                              if (user != null) {
+                                Navigator.pushReplacementNamed(
+                                    context, '/home');
+                              } else {
+                                setState(() {
+                                  _errorFeedback = 'Invalid email or password';
+                                });
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -127,8 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                       TextButton(
-                        onPressed: () async {
-                          // because we'll be doing request over the network
+                        onPressed: () {
                           Navigator.pushNamed(context, '/signup');
                         },
                         child: const Text(
