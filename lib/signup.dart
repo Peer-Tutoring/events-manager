@@ -9,6 +9,7 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  String? _errorFeedback;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -32,7 +33,6 @@ class _SignupPageState extends State<SignupPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Title Text
                   const Text(
                     'Create Account',
                     style: TextStyle(
@@ -43,15 +43,13 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Form Section
                   Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Row for First Name and Last Name
                         Row(
                           children: [
-                            // First Name Field
                             Expanded(
                               child: TextFormField(
                                 controller: _firstNameController,
@@ -74,8 +72,6 @@ class _SignupPageState extends State<SignupPage> {
                               ),
                             ),
                             const SizedBox(width: 8),
-
-                            // Last Name Field
                             Expanded(
                               child: TextFormField(
                                 controller: _lastNameController,
@@ -127,7 +123,6 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
@@ -151,17 +146,32 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         const SizedBox(height: 24),
 
-                        // Signup Button
+                        if (_errorFeedback != null)
+                          Text(
+                            _errorFeedback!,
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.left,
+                          ),
                         ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                _errorFeedback = null;
+                              });
+
                               final email = _emailController.text.trim();
                               final password = _passwordController.text.trim();
 
                               final user =
                                   await AuthService.signUp(email, password);
-
-                              Navigator.pushReplacementNamed(context, '/login');
+                              if (user != null) {
+                                Navigator.pushReplacementNamed(
+                                    context, '/login');
+                              } else {
+                                setState(() {
+                                  _errorFeedback = 'Email already in use';
+                                });
+                              }
                             }
                           },
                           style: ElevatedButton.styleFrom(
