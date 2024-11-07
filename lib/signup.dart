@@ -1,3 +1,4 @@
+import 'package:events_manager/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class SignupPage extends StatefulWidget {
@@ -152,11 +153,14 @@ class _SignupPageState extends State<SignupPage> {
 
                         // Signup Button
                         ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              // Process signup here
+                              final email = _emailController.text.trim();
+                              final password = _passwordController.text.trim();
 
-                              // Navigate to login after successful signup
+                              final user =
+                                  await AuthService.signUp(email, password);
+
                               Navigator.pushReplacementNamed(context, '/login');
                             }
                           },
