@@ -1,14 +1,16 @@
-import 'package:events_manager/services/auth_service.dart';
+import 'package:events_manager/enums/auth_status.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:events_manager/providers/auth_provider.dart'; // Import auth provider
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _errorFeedback;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
@@ -16,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authStatus = ref.watch(authProvider);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -31,7 +35,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Welcome Text
                   const Text(
                     'Welcome Back!',
                     style: TextStyle(
@@ -41,8 +44,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Form Section
                   Form(
                     key: _formKey,
                     child: Column(
@@ -73,8 +74,6 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-                        // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
@@ -105,27 +104,37 @@ class _LoginPageState extends State<LoginPage> {
                             textAlign: TextAlign.left,
                           ),
                         ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                _errorFeedback = null;
-                              });
-                              final email = _emailController.text.trim();
-                              final password = _passwordController.text.trim();
+                          onPressed: authStatus == AuthStatus.loading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _errorFeedback = null;
+                                    });
+                                    final email = _emailController.text.trim();
+                                    final password =
+                                        _passwordController.text.trim();
 
-                              final user =
-                                  await AuthService.signIn(email, password);
+                                    // Call the login function from authProvider
+                                    await ref
+                                        .read(authProvider.notifier)
+                                        .signIn(email, password);
 
-                              if (user != null) {
-                                Navigator.pushReplacementNamed(
-                                    context, '/home');
-                              } else {
-                                setState(() {
-                                  _errorFeedback = 'Invalid email or password';
-                                });
-                              }
-                            }
-                          },
+                                    // Check the authentication state
+                                    final currentAuthStatus =
+                                        ref.read(authProvider);
+                                    if (currentAuthStatus ==
+                                        AuthStatus.authenticated) {
+                                      Navigator.pushReplacementNamed(
+                                          context, '/home');
+                                    } else {
+                                      setState(() {
+                                        _errorFeedback =
+                                            'Invalid email or password';
+                                      });
+                                    }
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 32.0, vertical: 12.0),
@@ -133,14 +142,17 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
-                          child: const Text('Login'),
+                          child: authStatus == AuthStatus.loading
+                              ? CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : const Text('Login'),
                         ),
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

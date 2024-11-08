@@ -11,7 +11,7 @@ class AuthService {
 
       if (credential.user != null) {
         return AppUser(
-          id: credential.user!.uid,
+          uid: credential.user!.uid,
           email: credential.user!.email!,
         );
       }
@@ -33,7 +33,7 @@ class AuthService {
 
       if (credential.user != null) {
         return AppUser(
-          id: credential.user!.uid,
+          uid: credential.user!.uid,
           email: credential.user!.email!,
         );
       }

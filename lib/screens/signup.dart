@@ -1,14 +1,16 @@
-import 'package:events_manager/services/auth_service.dart';
+import 'package:events_manager/enums/auth_status.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:events_manager/providers/auth_provider.dart';
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+class SignupScreen extends ConsumerStatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   String? _errorFeedback;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
@@ -18,12 +20,14 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authStatus = ref.watch(authProvider);
+
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'login.png', // Background image for SignupPage
+              'login.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -42,7 +46,6 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Form(
                     key: _formKey,
                     child: Column(
@@ -96,8 +99,6 @@ class _SignupPageState extends State<SignupPage> {
                           ],
                         ),
                         const SizedBox(height: 16),
-
-                        // Email Field
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -123,7 +124,6 @@ class _SignupPageState extends State<SignupPage> {
                           },
                         ),
                         const SizedBox(height: 16),
-
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
@@ -147,7 +147,6 @@ class _SignupPageState extends State<SignupPage> {
                           },
                         ),
                         const SizedBox(height: 24),
-
                         if (_errorFeedback != null)
                           Text(
                             _errorFeedback!,
@@ -155,27 +154,38 @@ class _SignupPageState extends State<SignupPage> {
                             textAlign: TextAlign.left,
                           ),
                         ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              setState(() {
-                                _errorFeedback = null;
-                              });
+                          onPressed: authStatus == AuthStatus.loading
+                              ? null
+                              : () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    setState(() {
+                                      _errorFeedback = null;
+                                    });
 
-                              final email = _emailController.text.trim();
-                              final password = _passwordController.text.trim();
+                                    final email = _emailController.text.trim();
+                                    final password =
+                                        _passwordController.text.trim();
 
-                              final user =
-                                  await AuthService.signUp(email, password);
-                              if (user != null) {
-                                Navigator.pushReplacementNamed(
-                                    context, '/login');
-                              } else {
-                                setState(() {
-                                  _errorFeedback = 'Email already in use';
-                                });
-                              }
-                            }
-                          },
+                                    // Use authProvider to sign up
+                                    await ref
+                                        .read(authProvider.notifier)
+                                        .signUp(email, password);
+
+                                    // Check the result
+                                    final currentAuthStatus =
+                                        ref.read(authProvider);
+                                    if (currentAuthStatus ==
+                                        AuthStatus.authenticated) {
+                                      Navigator.pushReplacementNamed(
+                                          context, '/login');
+                                    } else {
+                                      setState(() {
+                                        _errorFeedback =
+                                            'Email already in use or signup failed';
+                                      });
+                                    }
+                                  }
+                                },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 32.0, vertical: 12.0),
@@ -183,14 +193,17 @@ class _SignupPageState extends State<SignupPage> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                           ),
-                          child: const Text('Sign Up'),
+                          child: authStatus == AuthStatus.loading
+                              ? CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : const Text('Sign Up'),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Redirect to Login
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

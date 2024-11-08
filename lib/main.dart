@@ -1,5 +1,8 @@
+import 'package:events_manager/enums/auth_status.dart';
+import 'package:events_manager/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/firebase_options.dart';
 import 'screens/login.dart';
 import 'screens/signup.dart';
@@ -8,11 +11,14 @@ import 'screens/event_detail.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,27 +27,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const AuthCheck(),
+      title: 'Events Manager',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const AuthWidget(),
       routes: {
-        '/signup': (context) => const SignupPage(),
-        '/home': (context) => const HomePage(),
-        '/eventDetail': (context) => const EventDetailPage(),
+        '/signup': (context) => const SignupScreen(),
+        '/home': (context) => const HomeScreen(),
+        '/eventDetail': (context) => const EventDetailScreen(),
       },
     );
   }
 }
 
-class AuthCheck extends StatelessWidget {
-  const AuthCheck({super.key});
+class AuthWidget extends ConsumerWidget {
+  const AuthWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Dummy authentication check
-    bool isAuthenticated = false;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authStatus = ref.watch(authProvider);
 
-    if (!isAuthenticated) {
-      return const LoginPage();
-    }
-    return const HomePage();
+    return authStatus == AuthStatus.authenticated
+        ? const HomeScreen()
+        : const LoginScreen();
   }
 }
