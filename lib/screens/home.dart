@@ -28,22 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final events = snapshot.data!.docs.map((doc) {
-            return Event(
-              name: doc['name'] ?? 'Unnamed Event',
-              startTime: (doc['startTime'] as Timestamp).toDate(),
-              endTime: (doc['endTime'] as Timestamp).toDate(),
-              location: doc['location'] ?? 'No location provided',
-              description: doc['description'] ?? 'No description',
-              icon: Icons.event,
-            );
-          }).toList();
+          final events = snapshot.data!.docs;
 
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemCount: events.length,
             itemBuilder: (context, index) {
-              final event = events[index];
+              final doc = events[index];
+              final event = Event(
+                name: doc['name'] ?? 'Unnamed Event',
+                startTime: (doc['startTime'] as Timestamp).toDate(),
+                endTime: (doc['endTime'] as Timestamp).toDate(),
+                location: doc['location'] ?? 'No location provided',
+                description: doc['description'] ?? 'No description',
+                icon: Icons.event,
+              );
+
               return Card(
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(vertical: 10.0),
@@ -142,6 +142,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () =>
+                              _showDeleteConfirmationDialog(doc.id),
+                        ),
                       ],
                     ),
                   ),
@@ -181,6 +189,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(String docId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Event"),
+          content: const Text("Are you sure you want to delete this event?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await eventsCollection.doc(docId).delete();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Event deleted successfully")),
+                );
+              },
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
     );
   }
 
