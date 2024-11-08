@@ -7,7 +7,6 @@ import 'config/firebase_options.dart';
 import 'screens/login.dart';
 import 'screens/signup.dart';
 import 'screens/home.dart';
-import 'screens/event_detail.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +35,6 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
-        '/eventDetail': (context) => const EventDetailScreen(),
       },
     );
   }
