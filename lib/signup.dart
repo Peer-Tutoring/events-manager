@@ -104,6 +104,7 @@ class _SignupPageState extends State<SignupPage> {
                           decoration: InputDecoration(
                             labelText: 'Email',
                             labelStyle: const TextStyle(color: Colors.black),
+                            prefixIcon: Icon(Icons.email),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -129,6 +130,7 @@ class _SignupPageState extends State<SignupPage> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle: const TextStyle(color: Colors.black),
+                            prefixIcon: Icon(Icons.lock),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
