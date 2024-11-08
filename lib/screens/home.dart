@@ -22,9 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Home Page'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: eventsCollection
-            .orderBy('startTime')
-            .snapshots(), // Sort by startTime
+        stream: eventsCollection.orderBy('startTime').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -95,39 +93,49 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(height: 8),
                               Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.access_time,
-                                    size: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      '${DateFormat('EEEE MM/dd, h:mm a').format(event.startTime)} - ${DateFormat('h:mm a').format(event.endTime)}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey[600],
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.access_time,
+                                            size: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            DateFormat('EEEE dd/MM, h:mm a')
+                                                .format(event.startTime),
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color: Colors.grey[600],
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      event.location,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey[600],
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            size: 16,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            event.location,
+                                            style: TextStyle(
+                                              fontSize: 13,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -144,11 +152,11 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       floatingActionButton: Container(
-        height: 70, // Adjust the size
+        height: 70,
         width: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [Colors.blueAccent, Colors.lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -158,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.blueAccent.withOpacity(0.4),
               spreadRadius: 5,
               blurRadius: 10,
-              offset: const Offset(0, 3), // Change position of shadow
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -169,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: 'Add New Event',
           child: const Icon(
             Icons.add,
-            size: 36, // Increase icon size for visibility
+            size: 36,
           ),
         ),
       ),
@@ -184,7 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime? selectedStartDate;
     DateTime? selectedEndDate;
 
-    Future<void> _pickDateTime(BuildContext context, bool isStart) async {
+    Future<void> pickDateTime(
+        BuildContext context, bool isStart, StateSetter setDialogState) async {
       final date = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -209,116 +218,133 @@ class _HomeScreenState extends State<HomeScreen> {
         time.minute,
       );
 
-      if (isStart) {
-        selectedStartDate = selectedDateTime;
-      } else {
-        selectedEndDate = selectedDateTime;
-      }
+      setDialogState(() {
+        if (isStart) {
+          selectedStartDate = selectedDateTime;
+        } else {
+          selectedEndDate = selectedDateTime;
+        }
+      });
     }
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: const Text("Add New Event"),
-          content: StatefulBuilder(
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: StatefulBuilder(
             builder: (context, setDialogState) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration:
-                          const InputDecoration(labelText: "Event Name"),
-                    ),
-                    TextField(
-                      controller: locationController,
-                      decoration: const InputDecoration(labelText: "Location"),
-                    ),
-                    TextField(
-                      controller: descriptionController,
-                      decoration:
-                          const InputDecoration(labelText: "Description"),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            selectedStartDate == null
-                                ? 'Start Time'
-                                : 'Start: ${DateFormat('EEEE MM/dd, h:mm a').format(selectedStartDate!)}',
-                            style: const TextStyle(fontSize: 16),
-                            overflow: TextOverflow
-                                .ellipsis, // Truncate overflowed text
+              return Container(
+                padding: const EdgeInsets.all(20),
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                  maxWidth: MediaQuery.of(context).size.width * 0.9,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        "Add New Event",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: "Event Name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: locationController,
+                        decoration: const InputDecoration(
+                          labelText: "Location",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: "Description",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        selectedStartDate == null
+                            ? 'Start Time'
+                            : 'Start: ${DateFormat('EEEE dd/MM, h:mm a').format(selectedStartDate!)}',
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.left,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await pickDateTime(context, true, setDialogState);
+                        },
+                        child: const Text('Pick Start Time'),
+                      ),
+                      Text(
+                        selectedEndDate == null
+                            ? 'End Time'
+                            : 'End: ${DateFormat('EEEE dd/MM, h:mm a').format(selectedEndDate!)}',
+                        style: const TextStyle(fontSize: 16),
+                        textAlign: TextAlign.left,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await pickDateTime(context, false, setDialogState);
+                        },
+                        child: const Text('Pick End Time'),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text("Cancel"),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            await _pickDateTime(context, true);
-                            setDialogState(() {}); // Update the dialog state
-                          },
-                          child: const Text('Pick Start Time'),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            selectedEndDate == null
-                                ? 'End Time'
-                                : 'End: ${DateFormat('EEEE MM/dd, h:mm a').format(selectedEndDate!)}',
-                            style: const TextStyle(fontSize: 16),
-                            overflow: TextOverflow
-                                .ellipsis, // Truncate overflowed text
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (selectedStartDate == null ||
+                                  selectedEndDate == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        "Please select start and end times."),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              await eventsCollection.add({
+                                'name': nameController.text,
+                                'location': locationController.text,
+                                'description': descriptionController.text,
+                                'startTime':
+                                    Timestamp.fromDate(selectedStartDate!),
+                                'endTime': Timestamp.fromDate(selectedEndDate!),
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Add Event"),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            await _pickDateTime(context, false);
-                            setDialogState(() {}); // Update the dialog state
-                          },
-                          child: const Text('Pick End Time'),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (selectedStartDate == null || selectedEndDate == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text("Please select start and end times.")),
-                  );
-                  return;
-                }
-
-                // Save event to Firestore
-                await eventsCollection.add({
-                  'name': nameController.text,
-                  'location': locationController.text,
-                  'description': descriptionController.text,
-                  'startTime': Timestamp.fromDate(selectedStartDate!),
-                  'endTime': Timestamp.fromDate(selectedEndDate!),
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text("Add Event"),
-            ),
-          ],
         );
       },
     );
