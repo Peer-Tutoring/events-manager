@@ -1,8 +1,10 @@
 import 'package:events_manager/models/event.dart';
 import 'package:events_manager/screens/event_detail.dart';
+import 'package:events_manager/screens/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,11 +17,47 @@ class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference eventsCollection =
       FirebaseFirestore.instance.collection('events');
 
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushReplacementNamed('/login'); // Optional navigation
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Page'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(),
+                  ),
+                );
+              } else if (value == 'logout') {
+                _logout();
+              }
+            },
+            icon: CircleAvatar(
+              backgroundColor: Colors.blueAccent,
+              child: const Icon(Icons.person, color: Colors.white),
+            ),
+            offset: const Offset(0, 50), // Adjusted offset
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Text('Settings'),
+              ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Text('Logout'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: eventsCollection.orderBy('startTime').snapshots(),
