@@ -171,11 +171,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                         .read(authProvider.notifier)
                                         .signUp(email, password);
 
-                                    // Check the result
                                     final currentAuthStatus =
                                         ref.read(authProvider);
                                     if (currentAuthStatus ==
-                                        AuthStatus.authenticated) {
+                                        AuthStatus.registered) {
                                       Navigator.pushReplacementNamed(
                                           context, '/login');
                                     } else {

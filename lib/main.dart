@@ -15,7 +15,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: MyApp(),
     ),
   );
@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
       home: const AuthWidget(),
       routes: {
         '/signup': (context) => const SignupScreen(),
+        '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
         '/eventDetail': (context) => const EventDetailScreen(),
       },

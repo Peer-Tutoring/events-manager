@@ -16,8 +16,8 @@ class AuthNotifier extends StateNotifier<AuthStatus> {
 
   Future<void> signUp(String email, String password) async {
     state = AuthStatus.loading;
-    await AuthService.signUp(email, password);
-    state = AuthStatus.unauthenticated;
+    final user = await AuthService.signUp(email, password);
+    state = user != null ? AuthStatus.registered : AuthStatus.error;
   }
 
   Future<void> signIn(String email, String password) async {

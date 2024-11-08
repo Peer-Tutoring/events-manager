@@ -1,1 +1,1 @@
-enum AuthStatus { authenticated, unauthenticated, loading, error }
+enum AuthStatus { authenticated, unauthenticated, loading, registered, error }

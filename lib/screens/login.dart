@@ -115,12 +115,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     final password =
                                         _passwordController.text.trim();
 
-                                    // Call the login function from authProvider
                                     await ref
                                         .read(authProvider.notifier)
                                         .signIn(email, password);
 
-                                    // Check the authentication state
                                     final currentAuthStatus =
                                         ref.read(authProvider);
                                     if (currentAuthStatus ==
