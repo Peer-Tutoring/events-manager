@@ -1,5 +1,6 @@
 import 'package:events_manager/models/event.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
@@ -8,6 +9,12 @@ class EventDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Format the start and end times
+    final String formattedStartTime =
+        DateFormat('yyyy-MM-dd HH:mm').format(event.startTime);
+    final String formattedEndTime =
+        DateFormat('yyyy-MM-dd HH:mm').format(event.endTime);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(event.name),
@@ -19,7 +26,7 @@ class EventDetailScreen extends StatelessWidget {
             // Header Banner
             Container(
               height: 200,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.blueAccent,
                 image: DecorationImage(
                   image: AssetImage(
@@ -64,17 +71,19 @@ class EventDetailScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.access_time,
                             color: Colors.blueAccent,
                             size: 28,
                           ),
                           const SizedBox(width: 16),
-                          Text(
-                            event.time,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
+                          Expanded(
+                            child: Text(
+                              'From: $formattedStartTime\nTo: $formattedEndTime',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
@@ -93,7 +102,7 @@ class EventDetailScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.location_on,
                             color: Colors.blueAccent,
                             size: 28,
@@ -119,7 +128,9 @@ class EventDetailScreen extends StatelessWidget {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 40.0, vertical: 15.0),
+                          horizontal: 40.0,
+                          vertical: 15.0,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
