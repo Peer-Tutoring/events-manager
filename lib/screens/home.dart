@@ -243,11 +243,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          selectedStartDate == null
-                              ? 'Start Time'
-                              : 'Start: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedStartDate!)}',
-                          style: const TextStyle(fontSize: 16),
+                        Flexible(
+                          child: Text(
+                            selectedStartDate == null
+                                ? 'Start Time'
+                                : 'Start: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedStartDate!)}',
+                            style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow
+                                .ellipsis, // Truncate overflowed text
+                          ),
                         ),
                         TextButton(
                           onPressed: () async {
@@ -261,11 +265,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          selectedEndDate == null
-                              ? 'End Time'
-                              : 'End: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedEndDate!)}',
-                          style: const TextStyle(fontSize: 16),
+                        Flexible(
+                          child: Text(
+                            selectedEndDate == null
+                                ? 'End Time'
+                                : 'End: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedEndDate!)}',
+                            style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow
+                                .ellipsis, // Truncate overflowed text
+                          ),
                         ),
                         TextButton(
                           onPressed: () async {

@@ -11,9 +11,9 @@ class EventDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Format the start and end times
     final String formattedStartTime =
-        DateFormat('yyyy-MM-dd HH:mm').format(event.startTime);
+        DateFormat('EEEE MM/dd, h:mm a').format(event.startTime);
     final String formattedEndTime =
-        DateFormat('yyyy-MM-dd HH:mm').format(event.endTime);
+        DateFormat('EEEE MM/dd, h:mm a').format(event.endTime);
 
     return Scaffold(
       appBar: AppBar(
@@ -23,14 +23,12 @@ class EventDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Banner
             Container(
               height: 200,
               decoration: const BoxDecoration(
                 color: Colors.blueAccent,
                 image: DecorationImage(
-                  image: AssetImage(
-                      'assets/event_banner.jpg'), // Replace with your image asset path
+                  image: AssetImage('assets/event_banner.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
