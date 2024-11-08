@@ -22,7 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Home Page'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: eventsCollection.snapshots(),
+        stream: eventsCollection
+            .orderBy('startTime')
+            .snapshots(), // Sort by startTime
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -102,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
-                                      '${DateFormat('yyyy-MM-dd HH:mm').format(event.startTime)} - ${DateFormat('HH:mm').format(event.endTime)}',
+                                      '${DateFormat('EEEE MM/dd, h:mm a').format(event.startTime)} - ${DateFormat('h:mm a').format(event.endTime)}',
                                       style: TextStyle(
                                         fontSize: 13,
                                         color: Colors.grey[600],
@@ -247,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text(
                             selectedStartDate == null
                                 ? 'Start Time'
-                                : 'Start: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedStartDate!)}',
+                                : 'Start: ${DateFormat('EEEE MM/dd, h:mm a').format(selectedStartDate!)}',
                             style: const TextStyle(fontSize: 16),
                             overflow: TextOverflow
                                 .ellipsis, // Truncate overflowed text
@@ -269,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text(
                             selectedEndDate == null
                                 ? 'End Time'
-                                : 'End: ${DateFormat('yyyy-MM-dd HH:mm').format(selectedEndDate!)}',
+                                : 'End: ${DateFormat('EEEE MM/dd, h:mm a').format(selectedEndDate!)}',
                             style: const TextStyle(fontSize: 16),
                             overflow: TextOverflow
                                 .ellipsis, // Truncate overflowed text
