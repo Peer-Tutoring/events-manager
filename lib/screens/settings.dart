@@ -21,7 +21,6 @@ class SettingsScreenState extends State<SettingsScreen> {
         User? user = _auth.currentUser;
 
         if (user != null) {
-          // Re-authenticate the user
           AuthCredential credential = EmailAuthProvider.credential(
             email: user.email!,
             password: _currentPasswordController.text,
@@ -29,18 +28,51 @@ class SettingsScreenState extends State<SettingsScreen> {
 
           await user.reauthenticateWithCredential(credential);
 
-          // Update password after successful re-authentication
           await user.updatePassword(_newPasswordController.text);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password updated successfully')),
-          );
+          _showSuccessSnackbar('Password updated successfully');
         }
+      } on FirebaseAuthException catch (e) {
+        _showErrorSnackbar(_getFriendlyErrorMessage(e));
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        _showErrorSnackbar('An unexpected error occurred. Please try again.');
       }
     }
+  }
+
+  // Map Firebase errors to friendly messages
+  String _getFriendlyErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'invalid-credential':
+        return 'The current password you entered is incorrect.';
+      case 'weak-password':
+        return 'Your new password is too weak. Please choose a stronger password.';
+      case 'requires-recent-login':
+        return 'Please log in again to confirm your identity before changing the password.';
+      case 'network-request-failed':
+        return 'Network error. Please check your connection and try again.';
+      default:
+        return 'An error occurred. Please try again.';
+    }
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
