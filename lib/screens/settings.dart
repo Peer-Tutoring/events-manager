@@ -30,6 +30,10 @@ class SettingsScreenState extends State<SettingsScreen> {
 
           await user.updatePassword(_newPasswordController.text);
           _showSuccessSnackbar('Password updated successfully');
+
+          _currentPasswordController.clear();
+          _newPasswordController.clear();
+          _confirmPasswordController.clear();
         }
       } on FirebaseAuthException catch (e) {
         _showErrorSnackbar(_getFriendlyErrorMessage(e));
@@ -44,10 +48,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     switch (e.code) {
       case 'invalid-credential':
         return 'The current password you entered is incorrect.';
-      case 'weak-password':
-        return 'Your new password is too weak. Please choose a stronger password.';
-      case 'requires-recent-login':
-        return 'Please log in again to confirm your identity before changing the password.';
       case 'network-request-failed':
         return 'Network error. Please check your connection and try again.';
       default:
