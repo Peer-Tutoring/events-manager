@@ -105,7 +105,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Email',
                             labelStyle: const TextStyle(color: Colors.black),
-                            prefixIcon: Icon(Icons.email),
+                            prefixIcon: const Icon(Icons.email),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -130,7 +130,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle: const TextStyle(color: Colors.black),
-                            prefixIcon: Icon(Icons.lock),
+                            prefixIcon: const Icon(Icons.lock),
                             filled: true,
                             fillColor: Colors.white,
                             border: OutlineInputBorder(
@@ -193,7 +193,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
                           ),
                           child: authStatus == AuthStatus.loading
-                              ? CircularProgressIndicator(
+                              ? const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                       Colors.white),
                                 )

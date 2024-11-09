@@ -34,7 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
               if (value == 'settings') {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen()),
                 );
               } else if (value == 'logout') {
                 _logout();

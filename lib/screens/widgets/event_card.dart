@@ -7,8 +7,7 @@ class EventCard extends StatelessWidget {
   final Event event;
   final VoidCallback onDelete;
 
-  const EventCard({Key? key, required this.event, required this.onDelete})
-      : super(key: key);
+  const EventCard({super.key, required this.event, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
