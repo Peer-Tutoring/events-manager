@@ -7,6 +7,7 @@ class Event {
   final String location;
   final String description;
   final IconData icon;
+  final String imagePath;
 
   Event({
     required this.name,
@@ -15,5 +16,6 @@ class Event {
     required this.location,
     required this.description,
     required this.icon,
+    required this.imagePath,
   });
 }
