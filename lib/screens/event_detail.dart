@@ -28,7 +28,7 @@ class EventDetailScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.blueAccent,
                 image: DecorationImage(
-                  image: AssetImage(event.imagePath ?? 'assets/default.jpg'),
+                  image: AssetImage(event.imagePath),
                   fit: BoxFit.cover,
                 ),
               ),
