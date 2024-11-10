@@ -11,9 +11,9 @@ class EventDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Format the start and end times
     final String formattedStartTime =
-        DateFormat('EEEE MM/dd, h:mm a').format(event.startTime);
+        DateFormat('EEE, dd MMM yyyy, h:mm a').format(event.startTime);
     final String formattedEndTime =
-        DateFormat('EEEE MM/dd, h:mm a').format(event.endTime);
+        DateFormat('EEE, dd MMM yyyy, h:mm a').format(event.endTime);
 
     return Scaffold(
       appBar: AppBar(
@@ -24,9 +24,12 @@ class EventDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              height: 200,
+              height: 240,
               decoration: BoxDecoration(
-                color: Colors.blueAccent,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
                 image: DecorationImage(
                   image: AssetImage(event.imagePath),
                   fit: BoxFit.cover,
@@ -34,7 +37,7 @@ class EventDetailScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -45,7 +48,7 @@ class EventDetailScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Text(
                     event.description,
                     style: TextStyle(
@@ -54,63 +57,17 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time,
-                            color: Colors.blueAccent,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              'From: $formattedStartTime\nTo: $formattedEndTime',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildInfoCard(
+                    icon: Icons.access_time,
+                    color: Colors.blueAccent,
+                    title: 'Event Time',
+                    content: 'From: $formattedStartTime\nTo: $formattedEndTime',
                   ),
-                  Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.blueAccent,
-                            size: 28,
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Text(
-                              event.location,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  _buildInfoCard(
+                    icon: Icons.location_on,
+                    color: Colors.redAccent,
+                    title: 'Location',
+                    content: event.location,
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -131,6 +88,58 @@ class EventDetailScreen extends StatelessWidget {
                         'Back to Home',
                         style: TextStyle(fontSize: 16),
                       ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String content,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              color: color,
+              size: 28,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    content,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
                     ),
                   ),
                 ],
