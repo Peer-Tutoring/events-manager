@@ -85,37 +85,65 @@ class AddEventDialogState extends State<AddEventDialog> {
               const Text(
                 "Add New Event",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
               ),
               const SizedBox(height: 20),
+              const Text(
+                "General Information",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Event Name",
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.event),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: locationController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Location",
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.location_on),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: descriptionController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: "Description",
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.description),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              const Text(
+                "Category",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                decoration: const InputDecoration(
-                  labelText: "Category",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: "Select Category",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 value: selectedCategory,
                 items: categoryImages.keys.map((String category) {
@@ -130,30 +158,35 @@ class AddEventDialogState extends State<AddEventDialog> {
                   });
                 },
               ),
-              const SizedBox(height: 16),
-              Text(
-                selectedStartDate == null
-                    ? 'Start Time'
-                    : 'Start: ${DateFormat('EEEE dd/MM, h:mm a').format(selectedStartDate!)}',
-                style: const TextStyle(fontSize: 16),
+              const SizedBox(height: 20),
+              const Text(
+                "Date and Time",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
-              TextButton(
+              const SizedBox(height: 10),
+              TextButton.icon(
+                icon: const Icon(Icons.calendar_today),
+                label: Text(
+                  selectedStartDate == null
+                      ? 'Pick Start Date & Time'
+                      : 'Start: ${DateFormat('EEE, dd MMM yyyy, h:mm a').format(selectedStartDate!)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
                 onPressed: () async {
                   await pickDateTime(context, true, setState);
                 },
-                child: const Text('Pick Start Time'),
               ),
-              Text(
-                selectedEndDate == null
-                    ? 'End Time'
-                    : 'End: ${DateFormat('EEEE dd/MM, h:mm a').format(selectedEndDate!)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              TextButton(
+              TextButton.icon(
+                icon: const Icon(Icons.calendar_today),
+                label: Text(
+                  selectedEndDate == null
+                      ? 'Pick End Date & Time'
+                      : 'End: ${DateFormat('EEE, dd MMM yyyy, h:mm a').format(selectedEndDate!)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
                 onPressed: () async {
                   await pickDateTime(context, false, setState);
                 },
-                child: const Text('Pick End Time'),
               ),
               if (endTimeError != null)
                 Padding(
@@ -169,7 +202,10 @@ class AddEventDialogState extends State<AddEventDialog> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text("Cancel"),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -204,7 +240,18 @@ class AddEventDialogState extends State<AddEventDialog> {
                       });
                       Navigator.of(context).pop();
                     },
-                    child: const Text("Add Event"),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      backgroundColor: Colors.blueAccent,
+                    ),
+                    child: const Text(
+                      "Add Event",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ],
               ),
