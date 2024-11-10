@@ -25,10 +25,10 @@ class EventDetailScreen extends StatelessWidget {
           children: [
             Container(
               height: 200,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.blueAccent,
                 image: DecorationImage(
-                  image: AssetImage('assets/event_banner.jpg'),
+                  image: AssetImage(event.imagePath ?? 'assets/default.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),

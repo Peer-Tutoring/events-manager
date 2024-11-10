@@ -68,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               location: doc['location'] ?? 'No location provided',
               description: doc['description'] ?? 'No description',
               icon: Icons.event,
+              imagePath: doc['imagePath'] ?? 'assets/default.jpg',
             );
           }).toList();
 
