@@ -18,6 +18,14 @@ class AddEventDialogState extends State<AddEventDialog> {
 
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
+  String? selectedCategory;
+
+  final Map<String, String> categoryImages = {
+    'Conference': 'conference.jpg',
+    'Workshop': 'workshop.png',
+    'Hackathon': 'hackathon.png',
+    'Party': 'party.jpg',
+  };
 
   Future<void> pickDateTime(
       BuildContext context, bool isStart, StateSetter setDialogState) async {
@@ -97,6 +105,25 @@ class AddEventDialogState extends State<AddEventDialog> {
                 ),
               ),
               const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: "Category",
+                  border: OutlineInputBorder(),
+                ),
+                value: selectedCategory,
+                items: categoryImages.keys.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCategory = newValue;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
               Text(
                 selectedStartDate == null
                     ? 'Start Time'
@@ -132,14 +159,17 @@ class AddEventDialogState extends State<AddEventDialog> {
                   ElevatedButton(
                     onPressed: () async {
                       if (selectedStartDate == null ||
-                          selectedEndDate == null) {
+                          selectedEndDate == null ||
+                          selectedCategory == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Please select start and end times."),
+                            content: Text("Please complete all fields."),
                           ),
                         );
                         return;
                       }
+
+                      final imagePath = categoryImages[selectedCategory!];
 
                       await widget.eventsCollection.add({
                         'name': nameController.text,
@@ -147,6 +177,8 @@ class AddEventDialogState extends State<AddEventDialog> {
                         'description': descriptionController.text,
                         'startTime': Timestamp.fromDate(selectedStartDate!),
                         'endTime': Timestamp.fromDate(selectedEndDate!),
+                        'category': selectedCategory,
+                        'imagePath': imagePath,
                       });
                       Navigator.of(context).pop();
                     },
