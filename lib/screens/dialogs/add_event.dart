@@ -19,6 +19,7 @@ class AddEventDialogState extends State<AddEventDialog> {
   DateTime? selectedStartDate;
   DateTime? selectedEndDate;
   String? selectedCategory;
+  String? endTimeError;
 
   final Map<String, String> categoryImages = {
     'Conference': 'conference.jpg',
@@ -56,8 +57,14 @@ class AddEventDialogState extends State<AddEventDialog> {
     setState(() {
       if (isStart) {
         selectedStartDate = selectedDateTime;
+        endTimeError = null;
       } else {
         selectedEndDate = selectedDateTime;
+        if (selectedEndDate!.isBefore(selectedStartDate!)) {
+          endTimeError = "End time should be after start time.";
+        } else {
+          endTimeError = null;
+        }
       }
     });
   }
@@ -148,6 +155,14 @@ class AddEventDialogState extends State<AddEventDialog> {
                 },
                 child: const Text('Pick End Time'),
               ),
+              if (endTimeError != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    endTimeError!,
+                    style: const TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -166,6 +181,13 @@ class AddEventDialogState extends State<AddEventDialog> {
                             content: Text("Please complete all fields."),
                           ),
                         );
+                        return;
+                      }
+
+                      if (selectedEndDate!.isBefore(selectedStartDate!)) {
+                        setState(() {
+                          endTimeError = "End time should be after start time.";
+                        });
                         return;
                       }
 
