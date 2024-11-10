@@ -43,7 +43,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  // Map Firebase errors to friendly messages
   String _getFriendlyErrorMessage(FirebaseAuthException e) {
     switch (e.code) {
       case 'invalid-credential':
@@ -88,16 +87,25 @@ class SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Title Section
               const Text(
                 'Change Password',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 10),
+              const Divider(thickness: 1.5),
               const SizedBox(height: 20),
+
               TextFormField(
                 controller: _currentPasswordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Current Password',
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -108,11 +116,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 20),
+
               TextFormField(
                 controller: _newPasswordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'New Password',
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -123,11 +137,17 @@ class SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 20),
+
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Confirm New Password',
-                  border: OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
                 ),
                 obscureText: true,
                 validator: (value) {
@@ -138,6 +158,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               const SizedBox(height: 30),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -145,12 +166,14 @@ class SettingsScreenState extends State<SettingsScreen> {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    textStyle: const TextStyle(fontSize: 16),
+                    backgroundColor: Colors.blueAccent,
                   ),
                   child: const Text(
                     'Save Changes',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
