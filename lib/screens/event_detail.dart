@@ -38,7 +38,6 @@ class EventDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Event Title
                   Text(
                     event.name,
                     style: const TextStyle(
@@ -47,8 +46,6 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-
-                  // Event Description
                   Text(
                     event.description,
                     style: TextStyle(
@@ -57,8 +54,6 @@ class EventDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-
-                  // Event Time Card
                   Card(
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
                     shape: RoundedRectangleBorder(
@@ -88,8 +83,6 @@ class EventDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // Event Location Card
                   Card(
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
                     shape: RoundedRectangleBorder(
@@ -119,8 +112,6 @@ class EventDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // Back Button
                   const SizedBox(height: 32),
                   Center(
                     child: ElevatedButton(
