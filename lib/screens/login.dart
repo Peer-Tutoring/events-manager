@@ -25,7 +25,7 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'login.png',
+              'login2.jpg',
               fit: BoxFit.cover,
             ),
           ),
