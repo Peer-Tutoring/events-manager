@@ -79,46 +79,54 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: eventsCollection.orderBy('startTime').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Stack(children: [
+        Positioned.fill(
+          child: Image.asset(
+            'login2.jpg',
+            fit: BoxFit.cover,
+          ),
+        ),
+        StreamBuilder<QuerySnapshot>(
+          stream: eventsCollection.orderBy('startTime').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          final events = snapshot.data!.docs.map((doc) {
-            return Event(
-              name: doc['name'] ?? 'Unnamed Event',
-              startTime: (doc['startTime'] as Timestamp).toDate(),
-              endTime: (doc['endTime'] as Timestamp).toDate(),
-              location: doc['location'] ?? 'No location provided',
-              description: doc['description'] ?? 'No description',
-              icon: Icons.event,
-              imagePath: doc['imagePath'] ?? 'assets/default.jpg',
-            );
-          }).toList();
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
-              return EventCard(
-                event: events[index],
-                onDelete: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => DeleteConfirmationDialog(
-                      docId: doc.id,
-                      eventsCollection: eventsCollection,
-                    ),
-                  );
-                },
+            final events = snapshot.data!.docs.map((doc) {
+              return Event(
+                name: doc['name'] ?? 'Unnamed Event',
+                startTime: (doc['startTime'] as Timestamp).toDate(),
+                endTime: (doc['endTime'] as Timestamp).toDate(),
+                location: doc['location'] ?? 'No location provided',
+                description: doc['description'] ?? 'No description',
+                icon: Icons.event,
+                imagePath: doc['imagePath'] ?? 'assets/default.jpg',
               );
-            },
-          );
-        },
-      ),
+            }).toList();
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final doc = snapshot.data!.docs[index];
+                return EventCard(
+                  event: events[index],
+                  onDelete: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => DeleteConfirmationDialog(
+                        docId: doc.id,
+                        eventsCollection: eventsCollection,
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
+      ]),
       floatingActionButton: Container(
         height: 70,
         width: 70,
