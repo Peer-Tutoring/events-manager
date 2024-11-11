@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events_manager/models/event.dart';
 import 'package:events_manager/screens/dialogs/add_event.dart';
 import 'package:events_manager/screens/dialogs/delete_confirmation.dart';
 import 'package:events_manager/screens/settings.dart';
 import 'package:events_manager/screens/widgets/event_card.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +17,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference eventsCollection =
       FirebaseFirestore.instance.collection('events');
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection('users');
+
+  String? _userName;
+
+  Future<void> _fetchUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userDoc = await usersCollection.doc(user.uid).get();
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        setState(() {
+          _userName = data['firstName'];
+        });
+      }
+    }
+  }
 
   Future<void> _logout() async {
     await FirebaseAuth.instance.signOut();
@@ -24,10 +41,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: Text(
+          _userName != null ? 'Events for $_userName' : 'Home Page',
+          style: TextStyle(fontSize: 24),
+        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
