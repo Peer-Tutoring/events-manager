@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           _userName != null ? 'Events for $_userName' : 'Home Page',
-          style: TextStyle(fontSize: 24),
+          style: const TextStyle(fontSize: 24),
         ),
         actions: [
           PopupMenuButton<String>(
