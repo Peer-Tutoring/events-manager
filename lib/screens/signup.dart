@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events_manager/enums/auth_status.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:events_manager/providers/auth_provider.dart';
@@ -17,6 +19,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _saveUserInfo(String uid) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'firstName': _firstNameController.text.trim(),
+      'lastName': _lastNameController.text.trim(),
+      'email': _emailController.text.trim(),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,7 +176,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                     final password =
                                         _passwordController.text.trim();
 
-                                    // Use authProvider to sign up
                                     await ref
                                         .read(authProvider.notifier)
                                         .signUp(email, password);
@@ -175,8 +184,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                         ref.read(authProvider);
                                     if (currentAuthStatus ==
                                         AuthStatus.registered) {
-                                      Navigator.pushReplacementNamed(
-                                          context, '/login');
+                                      final user =
+                                          FirebaseAuth.instance.currentUser;
+                                      if (user != null) {
+                                        await _saveUserInfo(user.uid);
+                                        Navigator.pushReplacementNamed(
+                                            context, '/login');
+                                      }
                                     } else {
                                       setState(() {
                                         _errorFeedback =
@@ -185,13 +199,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                     }
                                   }
                                 },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32.0, vertical: 12.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
                           child: authStatus == AuthStatus.loading
                               ? const CircularProgressIndicator(
                                   valueColor: AlwaysStoppedAnimation<Color>(
