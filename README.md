@@ -1,22 +1,22 @@
-# Events Manager
+# Events Manager 🎟️
 
 A Flutter app for creating, viewing, and managing events with Firebase for user authentication and data storage.
 
-## Features
+## Features ✨
 
-- **User Authentication**: Sign up, log in, and log out using Firebase Authentication.
-- **Event Creation**: Users can add events with a name, description, location, start and end times, and a category (each category has its own image).
-- **Event Sorting**: Events are sorted by date on the home screen.
-- **Password Management**: Change password feature in settings.
+- 🔒 **User Authentication**: Sign up, log in, and log out using Firebase Authentication.
+- 📅 **Event Creation**: Users can add events with details like name, description, location, start/end times, and category (each category has its own image).
+- 🔄 **Event Sorting**: Events are displayed on the home screen, sorted by date.
+- 🔑 **Password Management**: Change password feature in settings.
 
-## Setup Instructions
+## Getting Started 🚀
 
 ### Prerequisites
 
 - **Flutter SDK**: Install from [Flutter's website](https://flutter.dev/docs/get-started/install).
 - **Firebase Project**: Create a Firebase project at [Firebase Console](https://console.firebase.google.com/).
 
-### Steps
+### Installation Steps
 
 1. **Clone the Repo**:
 
@@ -27,12 +27,10 @@ A Flutter app for creating, viewing, and managing events with Firebase for user 
 
 2. **Firebase Setup**:
 
-   - Go to your Firebase project and add an Android app (and/or iOS app if testing on iOS).
-   - Register your app package name (e.g., `com.example.events_manager`).
-   - Download the `google-services.json` (for Android) or `GoogleService-Info.plist` (for iOS) file.
-   - Place `google-services.json` in `android/app` and `GoogleService-Info.plist` in `ios/Runner`.
-   - Enable **Authentication** and **Cloud Firestore** in the Firebase Console.
-   - Follow [FlutterFire setup](https://firebase.flutter.dev/docs/overview) to complete Firebase integration.
+   - In Firebase Console, create a new project and add an Android and/or iOS app.
+   - Download `google-services.json` (for Android) or `GoogleService-Info.plist` (for iOS) and place them in `android/app` or `ios/Runner`, respectively.
+   - Enable **Authentication** and **Firestore** in Firebase Console.
+   - Follow the [FlutterFire setup guide](https://firebase.flutter.dev/docs/overview) to integrate Firebase.
 
 3. **Install Dependencies**:
 
@@ -45,14 +43,14 @@ A Flutter app for creating, viewing, and managing events with Firebase for user 
    flutter run
    ```
 
-## Usage
+## Usage 🎉
 
-- **Sign Up**: Register with first and last name, email, and password. Name details are saved in Firestore.
-- **Add Events**: Add events with details. Each event category shows a unique image.
-- **View Events**: Events are displayed on the home screen, sorted by date.
-- **Settings**: Go to settings to change the password.
+- **Sign Up**: Register with your first and last name, email, and password.
+- **Add Events**: Add events with specific details. Each category displays a unique image.
+- **View Events**: Events are displayed by date on the home screen.
+- **Settings**: Change your password from the settings screen.
 
-## Dependencies
+## Dependencies 📦
 
 - `firebase_core`
 - `firebase_auth`
