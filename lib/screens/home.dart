@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events_manager/models/event.dart';
 import 'package:events_manager/screens/bookmarked_events.dart';
 import 'package:events_manager/screens/dialogs/add_event.dart';
-import 'package:events_manager/screens/dialogs/delete_confirmation.dart';
 import 'package:events_manager/screens/settings.dart';
 import 'package:events_manager/screens/widgets/event_card.dart';
 import 'package:flutter/material.dart';
@@ -192,15 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     event: event,
                     isFavorite: _favoriteEvents.contains(event.id),
                     onToggleFavorite: () => _toggleFavorite(event.id),
-                    onDelete: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DeleteConfirmationDialog(
-                          docId: event.id,
-                          eventsCollection: eventsCollection,
-                        ),
-                      );
-                    },
+                    eventsCollection: eventsCollection, // Added for delete
                   );
                 },
               );

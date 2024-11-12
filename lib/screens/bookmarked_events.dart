@@ -38,6 +38,18 @@ class _BookmarkedEventsScreenState extends State<BookmarkedEventsScreen> {
     }
   }
 
+  Future<void> _toggleFavorite(String eventId) async {
+    if (_favoriteEventIds.contains(eventId)) {
+      _favoriteEventIds.remove(eventId);
+    } else {
+      _favoriteEventIds.add(eventId);
+    }
+    await usersCollection.doc(_currentUser!.uid).update({
+      'favorites': _favoriteEventIds,
+    });
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,17 +86,8 @@ class _BookmarkedEventsScreenState extends State<BookmarkedEventsScreen> {
               return EventCard(
                 event: event,
                 isFavorite: true,
-                onToggleFavorite: () async {
-                  setState(() {
-                    _favoriteEventIds.remove(event.id);
-                  });
-                  await usersCollection.doc(_currentUser!.uid).update({
-                    'favorites': _favoriteEventIds,
-                  });
-                },
-                onDelete: () {
-                  eventsCollection.doc(event.id).delete();
-                },
+                onToggleFavorite: () => _toggleFavorite(event.id),
+                eventsCollection: eventsCollection,
               );
             },
           );
