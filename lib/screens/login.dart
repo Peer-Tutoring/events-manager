@@ -21,11 +21,12 @@ class LoginScreenState extends ConsumerState<LoginScreen> {
     final authStatus = ref.watch(authProvider);
 
     return Scaffold(
+      backgroundColor: Colors.brown[400],
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'login2.jpg',
+              'login.jpeg',
               fit: BoxFit.cover,
             ),
           ),

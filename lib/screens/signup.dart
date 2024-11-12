@@ -37,7 +37,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'login2.jpg',
+              'login.jpeg',
               fit: BoxFit.cover,
             ),
           ),
