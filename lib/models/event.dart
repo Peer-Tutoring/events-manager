@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Event {
+  final String id;
   final String name;
   final DateTime startTime;
   final DateTime endTime;
@@ -10,6 +11,7 @@ class Event {
   final String imagePath;
 
   Event({
+    required this.id,
     required this.name,
     required this.startTime,
     required this.endTime,
