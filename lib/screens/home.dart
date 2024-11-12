@@ -21,12 +21,12 @@ class _HomeScreenState extends State<HomeScreen> {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
 
-  String? _userName;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? _currentUser;
   List<String> _favoriteEvents = [];
+  int _currentIndex = 0;
 
   Future<void> _fetchUserName() async {
     _currentUser = _auth.currentUser;
@@ -35,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>;
         setState(() {
-          _userName = data['firstName'];
           _favoriteEvents = List<String>.from(data['favorites'] ?? []);
         });
       }
@@ -54,11 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
-  Future<void> _logout() async {
-    await _auth.signOut();
-    Navigator.of(context).pushReplacementNamed('/login');
-  }
-
   @override
   void initState() {
     super.initState();
@@ -68,138 +62,56 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _userName != null ? 'Events for $_userName' : 'Home Page',
-          style: const TextStyle(fontSize: 24),
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'settings') {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsScreen()),
-                );
-              } else if (value == 'logout') {
-                _logout();
-              } else if (value == 'bookmarks') {
-                // Navigate to bookmarks
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BookmarkedEventsScreen(),
-                  ),
-                );
-              }
-            },
-            icon: const CircleAvatar(
-              backgroundColor: Colors.blueAccent,
-              child: Icon(Icons.person, color: Colors.white),
-            ),
-            offset: const Offset(0, 50),
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'settings', child: Text('Settings')),
-              const PopupMenuItem(
-                  value: 'bookmarks', child: Text('Bookmarks')), // New item
-              const PopupMenuItem(value: 'logout', child: Text('Logout')),
-            ],
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60.0),
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search events...',
-                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onChanged: (query) {
-                setState(() {
-                  _searchQuery = query.toLowerCase();
-                });
-              },
-            ),
+      body: _currentIndex == 0
+          ? buildHomeScreen()
+          : _currentIndex == 1
+              ? const BookmarkedEventsScreen()
+              : const SettingsScreen(),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
           ),
         ),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: eventsCollection.orderBy('startTime').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          final events = snapshot.data!.docs.map((doc) {
-            return Event(
-              id: doc.id,
-              name: doc['name'] ?? 'Unnamed Event',
-              startTime: (doc['startTime'] as Timestamp).toDate(),
-              endTime: (doc['endTime'] as Timestamp).toDate(),
-              location: doc['location'] ?? 'No location provided',
-              description: doc['description'] ?? 'No description',
-              icon: Icons.event,
-              imagePath: doc['imagePath'] ?? 'assets/default.jpg',
-            );
-          }).where((event) {
-            final eventName = event.name.toLowerCase();
-            final eventLocation = event.location.toLowerCase();
-            return eventName.contains(_searchQuery) ||
-                eventLocation.contains(_searchQuery);
-          }).toList();
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              final event = events[index];
-              return EventCard(
-                event: event,
-                isFavorite: _favoriteEvents.contains(event.id),
-                onToggleFavorite: () => _toggleFavorite(event.id),
-                onDelete: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => DeleteConfirmationDialog(
-                      docId: event.id,
-                      eventsCollection: eventsCollection,
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          selectedItemColor: Colors.blueAccent,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home, size: 40),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite, size: 40),
+              label: 'Bookmarks',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings, size: 40),
+              label: 'Settings',
+            ),
+          ],
+        ),
       ),
       floatingActionButton: Container(
+        margin: const EdgeInsets.only(right: 16),
         height: 70,
         width: 70,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             colors: [Colors.blueAccent, Colors.lightBlue],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.4),
-              spreadRadius: 5,
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
         ),
         child: FloatingActionButton(
           onPressed: () {
@@ -215,6 +127,87 @@ class _HomeScreenState extends State<HomeScreen> {
           child: const Icon(Icons.add, size: 36),
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  Widget buildHomeScreen() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search events...',
+              prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onChanged: (query) {
+              setState(() {
+                _searchQuery = query.toLowerCase();
+              });
+            },
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: eventsCollection.orderBy('startTime').snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final events = snapshot.data!.docs.map((doc) {
+                return Event(
+                  id: doc.id,
+                  name: doc['name'] ?? 'Unnamed Event',
+                  startTime: (doc['startTime'] as Timestamp).toDate(),
+                  endTime: (doc['endTime'] as Timestamp).toDate(),
+                  location: doc['location'] ?? 'No location provided',
+                  description: doc['description'] ?? 'No description',
+                  icon: Icons.event,
+                  imagePath: doc['imagePath'] ?? 'assets/default.jpg',
+                );
+              }).where((event) {
+                final eventName = event.name.toLowerCase();
+                final eventLocation = event.location.toLowerCase();
+                return eventName.contains(_searchQuery) ||
+                    eventLocation.contains(_searchQuery);
+              }).toList();
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: events.length,
+                itemBuilder: (context, index) {
+                  final event = events[index];
+                  return EventCard(
+                    event: event,
+                    isFavorite: _favoriteEvents.contains(event.id),
+                    onToggleFavorite: () => _toggleFavorite(event.id),
+                    onDelete: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => DeleteConfirmationDialog(
+                          docId: event.id,
+                          eventsCollection: eventsCollection,
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
