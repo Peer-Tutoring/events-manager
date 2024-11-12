@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:events_manager/models/event.dart';
+import 'package:events_manager/screens/bookmarked_events.dart';
 import 'package:events_manager/screens/dialogs/add_event.dart';
 import 'package:events_manager/screens/dialogs/delete_confirmation.dart';
 import 'package:events_manager/screens/settings.dart';
@@ -23,22 +24,38 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _userName;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _currentUser;
+  List<String> _favoriteEvents = [];
 
   Future<void> _fetchUserName() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      final userDoc = await usersCollection.doc(user.uid).get();
+    _currentUser = _auth.currentUser;
+    if (_currentUser != null) {
+      final userDoc = await usersCollection.doc(_currentUser!.uid).get();
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>;
         setState(() {
           _userName = data['firstName'];
+          _favoriteEvents = List<String>.from(data['favorites'] ?? []);
         });
       }
     }
   }
 
+  Future<void> _toggleFavorite(String eventId) async {
+    if (_favoriteEvents.contains(eventId)) {
+      _favoriteEvents.remove(eventId);
+    } else {
+      _favoriteEvents.add(eventId);
+    }
+    await usersCollection.doc(_currentUser!.uid).update({
+      'favorites': _favoriteEvents,
+    });
+    setState(() {});
+  }
+
   Future<void> _logout() async {
-    await FirebaseAuth.instance.signOut();
+    await _auth.signOut();
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
@@ -67,6 +84,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               } else if (value == 'logout') {
                 _logout();
+              } else if (value == 'bookmarks') {
+                // Navigate to bookmarks
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BookmarkedEventsScreen(),
+                  ),
+                );
               }
             },
             icon: const CircleAvatar(
@@ -76,6 +101,8 @@ class _HomeScreenState extends State<HomeScreen> {
             offset: const Offset(0, 50),
             itemBuilder: (context) => [
               const PopupMenuItem(value: 'settings', child: Text('Settings')),
+              const PopupMenuItem(
+                  value: 'bookmarks', child: Text('Bookmarks')), // New item
               const PopupMenuItem(value: 'logout', child: Text('Logout')),
             ],
           ),
@@ -116,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           final events = snapshot.data!.docs.map((doc) {
             return Event(
+              id: doc.id,
               name: doc['name'] ?? 'Unnamed Event',
               startTime: (doc['startTime'] as Timestamp).toDate(),
               endTime: (doc['endTime'] as Timestamp).toDate(),
@@ -135,14 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.all(16.0),
             itemCount: events.length,
             itemBuilder: (context, index) {
-              final doc = snapshot.data!.docs[index];
+              final event = events[index];
               return EventCard(
-                event: events[index],
+                event: event,
+                isFavorite: _favoriteEvents.contains(event.id),
+                onToggleFavorite: () => _toggleFavorite(event.id),
                 onDelete: () {
                   showDialog(
                     context: context,
                     builder: (context) => DeleteConfirmationDialog(
-                      docId: doc.id,
+                      docId: event.id,
                       eventsCollection: eventsCollection,
                     ),
                   );
