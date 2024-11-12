@@ -27,7 +27,6 @@ class SettingsScreenState extends State<SettingsScreen> {
           );
 
           await user.reauthenticateWithCredential(credential);
-
           await user.updatePassword(_newPasswordController.text);
           _showSuccessSnackbar('Password updated successfully');
 
@@ -41,6 +40,11 @@ class SettingsScreenState extends State<SettingsScreen> {
         _showErrorSnackbar('An unexpected error occurred. Please try again.');
       }
     }
+  }
+
+  Future<void> _logout() async {
+    await _auth.signOut();
+    Navigator.of(context).pushReplacementNamed('/login');
   }
 
   String _getFriendlyErrorMessage(FirebaseAuthException e) {
@@ -82,103 +86,137 @@ class SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title Section
-              const Text(
-                'Change Password',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Divider(thickness: 1.5),
-              const SizedBox(height: 20),
-
-              TextFormField(
-                controller: _currentPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Current Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title Section
+                  const Text(
+                    'Change Password',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your current password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  const Divider(thickness: 1.5),
+                  const SizedBox(height: 20),
 
-              TextFormField(
-                controller: _newPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'New Password',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  TextFormField(
+                    controller: _currentPasswordController,
+                    decoration: InputDecoration(
+                      labelText: 'Current Password',
+                      prefixIcon: const Icon(Icons.lock),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your current password';
+                      }
+                      return null;
+                    },
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value != null && value.isNotEmpty && value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  TextFormField(
+                    controller: _newPasswordController,
+                    decoration: InputDecoration(
+                      labelText: 'New Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value != null &&
+                          value.isNotEmpty &&
+                          value.length < 6) {
+                        return 'Password must be at least 6 characters long';
+                      }
+                      return null;
+                    },
                   ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                obscureText: true,
-                validator: (value) {
-                  if (value != _newPasswordController.text) {
-                    return 'Passwords do not match';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
-              SizedBox(
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration: InputDecoration(
+                      labelText: 'Confirm New Password',
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value != _newPasswordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _updatePassword,
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: const TextStyle(fontSize: 16),
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      child: const Text(
+                        'Save Changes',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 40),
+            const Text(
+              'Account Settings',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            const Divider(thickness: 1.5),
+            const SizedBox(height: 20),
+            Center(
+              child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _updatePassword,
+                  onPressed: _logout,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    textStyle: const TextStyle(fontSize: 16),
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: Colors.redAccent,
                   ),
                   child: const Text(
-                    'Save Changes',
+                    'Logout',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
