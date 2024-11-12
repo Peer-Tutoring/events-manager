@@ -2,20 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:events_manager/models/event.dart';
 import 'package:events_manager/screens/event_detail.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
-  final VoidCallback onDelete;
+  final CollectionReference eventsCollection;
 
   const EventCard({
     super.key,
     required this.event,
     required this.isFavorite,
     required this.onToggleFavorite,
-    required this.onDelete,
+    required this.eventsCollection,
   });
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Event"),
+        content: const Text("Are you sure you want to delete this event?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await eventsCollection.doc(event.id).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Event deleted successfully")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,27 +96,20 @@ class EventCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: isFavorite ? Colors.red : Colors.grey,
-                              size: 20,
-                            ),
-                            onPressed: onToggleFavorite,
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Colors.redAccent,
-                              size: 20,
-                            ),
-                            onPressed: onDelete,
-                          ),
-                        ],
+                      IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: Colors.red,
+                        ),
+                        onPressed: onToggleFavorite,
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.redAccent,
+                          size: 20,
+                        ),
+                        onPressed: () => _confirmDelete(context),
                       ),
                     ],
                   ),
