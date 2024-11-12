@@ -21,6 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
       FirebaseFirestore.instance.collection('users');
 
   String? _userName;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   Future<void> _fetchUserName() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -78,6 +80,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search events...',
+                prefixIcon: const Icon(Icons.search, color: Colors.blueAccent),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _searchQuery = query.toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: eventsCollection.orderBy('startTime').snapshots(),
@@ -96,6 +124,11 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.event,
               imagePath: doc['imagePath'] ?? 'assets/default.jpg',
             );
+          }).where((event) {
+            final eventName = event.name.toLowerCase();
+            final eventLocation = event.location.toLowerCase();
+            return eventName.contains(_searchQuery) ||
+                eventLocation.contains(_searchQuery);
           }).toList();
 
           return ListView.builder(
