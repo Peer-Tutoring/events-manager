@@ -5,9 +5,17 @@ import 'package:events_manager/screens/event_detail.dart';
 
 class EventCard extends StatelessWidget {
   final Event event;
+  final bool isFavorite;
+  final VoidCallback onToggleFavorite;
   final VoidCallback onDelete;
 
-  const EventCard({super.key, required this.event, required this.onDelete});
+  const EventCard({
+    super.key,
+    required this.event,
+    required this.isFavorite,
+    required this.onToggleFavorite,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -60,13 +68,27 @@ class EventCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.redAccent,
-                          size: 20,
-                        ),
-                        onPressed: onDelete,
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              color: isFavorite ? Colors.red : Colors.grey,
+                              size: 20,
+                            ),
+                            onPressed: onToggleFavorite,
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.redAccent,
+                              size: 20,
+                            ),
+                            onPressed: onDelete,
+                          ),
+                        ],
                       ),
                     ],
                   ),
